@@ -332,6 +332,13 @@
           «Домой», а уже потом нажимать регистрацию.
         </p>
         <div class="stack">
+          <label for="pair-id">Код пары (`pair`)</label>
+          <input id="pair-id" type="text" placeholder="Например: c546d5d2f51a8111" autocomplete="off" />
+          <label for="invite-token">Токен приглашения (`invite`)</label>
+          <input id="invite-token" type="text" placeholder="Например: jxYH_sh_a-8E7jLH" autocomplete="off" />
+          <label for="invite-url">Или полная ссылка приглашения</label>
+          <input id="invite-url" type="text" placeholder="Можно вставить полную ссылку, если так удобнее" autocomplete="off" />
+          <button id="apply-invite" class="secondary">Применить данные приглашения</button>
           <label for="display-name">Как тебя подписать в паре</label>
           <input id="display-name" type="text" placeholder="Например: Никита" autocomplete="off" />
           <button id="register-device" class="primary">Привязать это устройство ❤️</button>
@@ -386,6 +393,10 @@
     const createStatus = document.getElementById("create-status");
 
     const displayNameInput = document.getElementById("display-name");
+    const pairIdInput = document.getElementById("pair-id");
+    const inviteTokenInput = document.getElementById("invite-token");
+    const inviteUrlInput = document.getElementById("invite-url");
+    const applyInviteButton = document.getElementById("apply-invite");
     const registerButton = document.getElementById("register-device");
     const refreshButton = document.getElementById("refresh-device");
     const registerStatus = document.getElementById("register-status");
@@ -425,6 +436,17 @@
       localStorage.setItem(REGISTRATION_STORAGE_KEY, JSON.stringify(registration));
     }
 
+    function saveInviteDetails({ pairId, inviteToken }) {
+      const registration = loadRegistration() || {};
+      pairIdInput.value = pairId;
+      inviteTokenInput.value = inviteToken;
+      saveRegistration({
+        ...registration,
+        pairId,
+        inviteToken
+      });
+    }
+
     function setStatus(element, message, type = "") {
       element.textContent = message;
       element.className = `status${type ? " " + type : ""}`;
@@ -444,11 +466,54 @@
     }
 
     function getActivePairId() {
-      return urlParams.get("pair") || savedRegistration?.pairId || "";
+      return urlParams.get("pair") || loadRegistration()?.pairId || "";
     }
 
     function getActiveInviteToken() {
-      return urlParams.get("invite") || savedRegistration?.inviteToken || "";
+      return urlParams.get("invite") || loadRegistration()?.inviteToken || "";
+    }
+
+    function parseInviteUrl(value) {
+      const trimmedValue = value.trim();
+
+      if (!trimmedValue) {
+        throw new Error("Вставь ссылку приглашения");
+      }
+
+      const inviteUrl = new URL(trimmedValue);
+      const pairId = inviteUrl.searchParams.get("pair");
+      const inviteToken = inviteUrl.searchParams.get("invite");
+
+      if (!pairId || !inviteToken) {
+        throw new Error("В ссылке не найден pair или invite");
+      }
+
+      return {
+        pairId,
+        inviteToken
+      };
+    }
+
+    function parseInviteFields() {
+      const pairId = pairIdInput.value.trim();
+      const inviteToken = inviteTokenInput.value.trim();
+
+      if (!pairId || !inviteToken) {
+        throw new Error("Введи и код пары, и токен приглашения");
+      }
+
+      return {
+        pairId,
+        inviteToken
+      };
+    }
+
+    function applyInviteFromUrl(value) {
+      const inviteDetails = parseInviteUrl(value);
+      saveInviteDetails(inviteDetails);
+      inviteUrlInput.value = value.trim();
+
+      return inviteDetails;
     }
 
     async function loadConfig() {
@@ -630,6 +695,23 @@
       }
     };
 
+    applyInviteButton.onclick = () => {
+      try {
+        const inviteDetails = inviteUrlInput.value.trim()
+          ? applyInviteFromUrl(inviteUrlInput.value)
+          : parseInviteFields();
+
+        saveInviteDetails(inviteDetails);
+        setStatus(
+          registerStatus,
+          `Ссылка применена. Пара ${inviteDetails.pairId} готова к регистрации.`,
+          "success"
+        );
+      } catch (error) {
+        setStatus(registerStatus, error.message, "error");
+      }
+    };
+
     registerButton.onclick = async () => {
       setStatus(registerStatus, "Подключаю устройство...");
 
@@ -666,6 +748,13 @@
     };
 
     if (savedRegistration) {
+      if (savedRegistration.inviteToken && savedRegistration.pairId) {
+        pairIdInput.value = savedRegistration.pairId;
+        inviteTokenInput.value = savedRegistration.inviteToken;
+        inviteUrlInput.value =
+          `https://project-1wk6k.vercel.app/?pair=${savedRegistration.pairId}&invite=${savedRegistration.inviteToken}`;
+      }
+
       renderPair(
         {
           id: savedRegistration.pairId,
@@ -676,6 +765,11 @@
     }
 
     if (urlParams.get("pair") && urlParams.get("invite")) {
+      saveInviteDetails({
+        pairId: urlParams.get("pair"),
+        inviteToken: urlParams.get("invite")
+      });
+      inviteUrlInput.value = window.location.href;
       setStatus(registerStatus, "Ссылка приглашения распознана. Осталось нажать регистрацию.", "success");
     }
   </script>
