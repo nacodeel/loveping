@@ -74,6 +74,7 @@ export function publicPair(pair) {
     createdAt: pair.createdAt,
     members: pair.members.map(member => ({
       name: member.name,
+      notificationName: member.notificationName || member.name,
       createdAt: member.createdAt,
       updatedAt: member.updatedAt
     }))
@@ -112,6 +113,7 @@ export async function registerPairMember({
   inviteToken,
   memberToken,
   name,
+  notificationName,
   pairId,
   subscription
 }) {
@@ -128,12 +130,14 @@ export async function registerPairMember({
 
   const now = new Date().toISOString();
   const trimmedName = name.trim();
+  const trimmedNotificationName = (notificationName || name).trim();
   const existingMember = memberToken
     ? pair.members.find(item => item.memberToken === memberToken)
     : null;
 
   if (existingMember) {
     existingMember.name = trimmedName;
+    existingMember.notificationName = trimmedNotificationName;
     existingMember.subscription = subscription;
     existingMember.updatedAt = now;
     ensureShortcutToken(existingMember);
@@ -154,6 +158,7 @@ export async function registerPairMember({
     memberToken: createToken(),
     shortcutToken: createToken(24),
     name: trimmedName,
+    notificationName: trimmedNotificationName,
     subscription,
     createdAt: now,
     updatedAt: now

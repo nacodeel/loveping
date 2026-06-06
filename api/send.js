@@ -8,22 +8,28 @@ webpush.setVapidDetails(
   process.env.VAPID_PRIVATE_KEY
 );
 
-function buildNotificationPayload({ senderName, text }) {
-  const trimmedText = typeof text === "string" ? text.trim() : "";
-  const defaultText = "Я тебя люблю";
+const MAX_SENDER_NAME_LENGTH = 24;
+const MAX_BODY_LENGTH = 120;
+const MAX_TITLE_LENGTH = 60;
 
-  if (senderName) {
-    return {
-      title: `Я тебя люблю от ${senderName}!`,
-      body: trimmedText || defaultText,
-      icon: "/icon-heart.svg",
-      badge: "/badge-heart.svg"
-    };
+function truncateText(value, maxLength) {
+  const normalizedValue = typeof value === "string" ? value.trim() : "";
+
+  if (!normalizedValue || normalizedValue.length <= maxLength) {
+    return normalizedValue;
   }
 
+  return `${normalizedValue.slice(0, maxLength - 1)}…`;
+}
+
+function buildNotificationPayload({ senderName, text }) {
+  const safeSenderName = truncateText(senderName || "Никита", MAX_SENDER_NAME_LENGTH) || "Никита";
+  const trimmedText = truncateText(text, MAX_BODY_LENGTH);
+  const defaultTitle = truncateText(`Я тебя люблю от ${safeSenderName}`, MAX_TITLE_LENGTH);
+
   return {
-    title: "Я тебя люблю ❤️",
-    body: trimmedText || defaultText,
+    title: defaultTitle,
+    body: trimmedText,
     icon: "/icon-heart.svg",
     badge: "/badge-heart.svg"
   };
@@ -42,9 +48,7 @@ export default async function handler(req, res) {
 
   let text = req.method === "POST" ? req.body?.text : req.query.text;
 
-  if (!text || text.trim() === "") {
-    text = "Я тебя люблю";
-  }
+  text = text && text.trim() ? text.trim() : "";
 
   if (memberToken || shortcutToken) {
     const pairResult = memberToken
@@ -76,7 +80,7 @@ export default async function handler(req, res) {
 
       try {
         const payload = buildNotificationPayload({
-          senderName: member.name,
+          senderName: member.notificationName || member.name,
           text
         });
 
@@ -106,7 +110,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       success: true,
-      text,
+      text: text || "Я тебя люблю от Никита",
       deliveredTo
     });
   }
@@ -148,6 +152,6 @@ export default async function handler(req, res) {
 
   return res.status(200).json({
     success: true,
-    text
+    text: text || "Я тебя люблю от Никита"
   });
 }

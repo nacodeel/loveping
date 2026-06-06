@@ -10,7 +10,7 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Love Push" />
+  <meta name="apple-mobile-web-app-title" content="LovePush" />
   <meta name="theme-color" content="#ff4f8b" />
   <style>
     :root {
@@ -44,9 +44,9 @@
     }
 
     .shell {
-      width: min(100%, 1040px);
+      width: min(100%, 920px);
       margin: 0 auto;
-      padding: 24px 18px 48px;
+      padding: 18px 14px 40px;
     }
 
     .hero,
@@ -59,8 +59,8 @@
     .hero {
       position: relative;
       overflow: hidden;
-      padding: 28px;
-      border-radius: 34px;
+      padding: 22px;
+      border-radius: 28px;
     }
 
     .hero::after {
@@ -85,7 +85,7 @@
 
     h1 {
       margin: 0;
-      font-size: clamp(40px, 8vw, 72px);
+      font-size: clamp(36px, 10vw, 64px);
       line-height: 0.95;
     }
 
@@ -99,9 +99,9 @@
     }
 
     .lead {
-      max-width: 660px;
-      margin: 16px 0 0;
-      font-size: 18px;
+      max-width: 560px;
+      margin: 14px 0 0;
+      font-size: 16px;
       color: var(--muted);
     }
 
@@ -109,7 +109,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 22px;
+      margin-top: 18px;
     }
 
     .pill {
@@ -123,14 +123,23 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: 1fr;
       gap: 18px;
       margin-top: 18px;
     }
 
     .card {
-      padding: 22px;
+      padding: 18px;
       border-radius: var(--radius-xl);
+    }
+
+    .section-label {
+      margin: 0 0 6px;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent-2);
+      font-weight: 700;
     }
 
     .card p,
@@ -188,9 +197,9 @@
     }
 
     .love-button {
-      min-height: 168px;
+      min-height: 132px;
       border-radius: 28px;
-      font-size: clamp(28px, 5vw, 42px);
+      font-size: clamp(26px, 7vw, 40px);
       font-weight: 800;
       background:
         radial-gradient(circle at top, rgba(255, 255, 255, 0.24), transparent 42%),
@@ -246,6 +255,13 @@
       font-size: 13px;
     }
 
+    .mini-note {
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
     .steps {
       display: grid;
       gap: 10px;
@@ -292,15 +308,9 @@
       line-height: 1.5;
     }
 
-    @media (max-width: 640px) {
-      .shell {
-        padding: 16px 14px 36px;
-      }
-
-      .hero,
-      .card {
-        padding: 18px;
-        border-radius: 24px;
+    @media (min-width: 820px) {
+      .grid.two-up {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
   </style>
@@ -308,24 +318,25 @@
 <body>
   <main class="shell">
     <section class="hero">
-      <p class="eyebrow">Private Pair Push</p>
+      <p class="eyebrow">LovePush</p>
       <h1>Love Push</h1>
       <p class="lead">
-        Создай одну уникальную ссылку-приглашение, отправь её любимому человеку и свяжи только ваши
-        два устройства. После регистрации каждый из вас сможет в один тап отправлять пуш другому.
+        Простая личная кнопка любви для вас двоих. Подключаете пару один раз, а потом отправляете
+        пуш в одно нажатие или через Команды на iPhone.
       </p>
       <div class="pill-row">
         <span class="pill">Только для вашей пары</span>
-        <span class="pill">Работает через Vercel + Web Push</span>
-        <span class="pill">Можно вынести на экран iPhone</span>
+        <span class="pill">Пуши на iPhone</span>
+        <span class="pill">Команды и ярлыки</span>
       </div>
     </section>
 
-    <section class="grid">
+    <section class="grid two-up">
       <article class="card">
+        <p class="section-label">Шаг 1</p>
         <h2>1. Создать приглашение</h2>
         <p>
-          Это делаешь ты один раз. Введи секрет настройки, создай пару и отправь полученную ссылку.
+          Делается один раз. Создай пару и отправь ссылку любимому человеку.
         </p>
         <div class="stack">
           <label for="setup-secret">Секрет настройки пары</label>
@@ -338,21 +349,24 @@
       </article>
 
       <article class="card">
+        <p class="section-label">Шаг 2</p>
         <h2>2. Подключить устройство</h2>
         <p>
-          Открой эту страницу по ссылке-приглашению. На iPhone лучше сначала добавить её на экран
-          «Домой», а уже потом нажимать регистрацию.
+          На iPhone лучше сначала добавить сайт на экран «Домой», а уже потом подключать устройство.
         </p>
         <div class="stack">
-          <label for="pair-id">Код пары (`pair`)</label>
+          <label for="pair-id">Код пары</label>
           <input id="pair-id" type="text" placeholder="Например: c546d5d2f51a8111" autocomplete="off" />
-          <label for="invite-token">Токен приглашения (`invite`)</label>
+          <label for="invite-token">Токен приглашения</label>
           <input id="invite-token" type="text" placeholder="Например: jxYH_sh_a-8E7jLH" autocomplete="off" />
-          <label for="invite-url">Или полная ссылка приглашения</label>
+          <label for="invite-url">Или полная ссылка</label>
           <input id="invite-url" type="text" placeholder="Можно вставить полную ссылку, если так удобнее" autocomplete="off" />
           <button id="apply-invite" class="secondary">Применить данные приглашения</button>
-          <label for="display-name">Как тебя подписать в паре</label>
+          <label for="display-name">Твоё имя в паре</label>
           <input id="display-name" type="text" placeholder="Например: Никита" autocomplete="off" />
+          <label for="notification-name">Как ты будешь называться в пушах</label>
+          <input id="notification-name" type="text" placeholder="Например: Котёнок" autocomplete="off" />
+          <p class="mini-note">Это имя увидит второй человек в уведомлении.</p>
           <button id="register-device" class="primary">Привязать это устройство ❤️</button>
           <button id="refresh-device" class="secondary">Обновить подписку на этом устройстве</button>
           <div id="register-status" class="status"></div>
@@ -361,16 +375,16 @@
       </article>
     </section>
 
-    <section class="grid">
+    <section class="grid two-up">
       <article class="card">
+        <p class="section-label">Шаг 3</p>
         <h2>3. Отправить любовь</h2>
         <p>
-          После регистрации устройства здесь появляется большая кнопка. Нажимаешь и пуш уходит
-          только второму участнику вашей пары.
+          Если текст пустой, уйдёт простой пуш. Если заполнишь поле, в уведомлении появится твой текст.
         </p>
         <div class="stack">
-          <label for="message">Текст уведомления</label>
-          <textarea id="message" placeholder="Я тебя люблю">Я тебя люблю</textarea>
+          <label for="message">Свой текст для пуша (необязательно)</label>
+          <textarea id="message" placeholder="Например: Спокойной ночи, любимая ❤️"></textarea>
           <button id="send-love" class="love-button">
             Отправить любовь ❤️
             <small>один тап и пуш улетел</small>
@@ -384,6 +398,7 @@
       </article>
 
       <article class="card">
+        <p class="section-label">Шаг 4</p>
         <h2>Как поставить на iPhone</h2>
         <ol class="steps">
           <li>Открой страницу в Safari.</li>
@@ -408,6 +423,7 @@
     const createStatus = document.getElementById("create-status");
 
     const displayNameInput = document.getElementById("display-name");
+    const notificationNameInput = document.getElementById("notification-name");
     const pairIdInput = document.getElementById("pair-id");
     const inviteTokenInput = document.getElementById("invite-token");
     const inviteUrlInput = document.getElementById("invite-url");
@@ -435,6 +451,10 @@
       displayNameInput.value = savedRegistration.name;
     }
 
+    if (savedRegistration?.notificationName) {
+      notificationNameInput.value = savedRegistration.notificationName;
+    }
+
     function loadRegistration() {
       const raw = localStorage.getItem(REGISTRATION_STORAGE_KEY);
 
@@ -458,8 +478,14 @@
         return "";
       }
 
-      const text = encodeURIComponent(messageInput.value.trim() || "Я тебя люблю");
-      return `https://project-1wk6k.vercel.app/api/send?shortcutToken=${registration.shortcutToken}&text=${text}`;
+      const shortcutUrl = new URL("https://project-1wk6k.vercel.app/api/send");
+      shortcutUrl.searchParams.set("shortcutToken", registration.shortcutToken);
+
+      if (messageInput.value.trim()) {
+        shortcutUrl.searchParams.set("text", messageInput.value.trim());
+      }
+
+      return shortcutUrl.toString();
     }
 
     function renderShortcutUrl(registration) {
@@ -627,6 +653,7 @@
       const pairId = getActivePairId();
       const inviteToken = getActiveInviteToken();
       const name = displayNameInput.value.trim();
+      const notificationName = notificationNameInput.value.trim() || name;
 
       if (!pairId || !inviteToken) {
         throw new Error("Открой страницу именно по ссылке-приглашению");
@@ -648,6 +675,7 @@
           pairId,
           inviteToken,
           name,
+          notificationName,
           memberToken: currentRegistration?.memberToken,
           subscription
         })
@@ -664,6 +692,7 @@
         memberToken: data.memberToken,
         shortcutToken: data.shortcutToken,
         name,
+        notificationName,
         pairId
       };
 
@@ -687,7 +716,7 @@
         }
       }
 
-      const text = messageInput.value.trim() || "Я тебя люблю";
+      const text = messageInput.value.trim();
 
       async function callSend(activeRegistration) {
         const response = await fetch("/api/send", {
@@ -826,6 +855,10 @@
         inviteTokenInput.value = savedRegistration.inviteToken;
         inviteUrlInput.value =
           `https://project-1wk6k.vercel.app/?pair=${savedRegistration.pairId}&invite=${savedRegistration.inviteToken}`;
+      }
+
+      if (savedRegistration.notificationName) {
+        notificationNameInput.value = savedRegistration.notificationName;
       }
 
       renderPair(

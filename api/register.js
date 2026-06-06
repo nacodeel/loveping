@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { inviteToken, memberToken, name, pairId, subscription } = req.body || {};
+  const { inviteToken, memberToken, name, notificationName, pairId, subscription } = req.body || {};
 
   if (!pairId || !inviteToken) {
     return res.status(400).json({
@@ -30,6 +30,7 @@ export default async function handler(req, res) {
       inviteToken,
       memberToken,
       name,
+      notificationName,
       pairId,
       subscription
     });

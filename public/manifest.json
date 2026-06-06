@@ -1,6 +1,6 @@
 {
-  "name": "Love Push",
-  "short_name": "Love",
+  "name": "LovePush",
+  "short_name": "LovePush",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
