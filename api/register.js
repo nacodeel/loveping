@@ -37,6 +37,7 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       memberToken: result.member.memberToken,
+      shortcutToken: result.member.shortcutToken,
       pair: publicPair(result.pair)
     });
   } catch (error) {

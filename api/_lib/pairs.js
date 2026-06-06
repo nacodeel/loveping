@@ -9,6 +9,14 @@ function createPairId() {
   return randomBytes(8).toString("hex");
 }
 
+function ensureShortcutToken(member) {
+  if (!member.shortcutToken) {
+    member.shortcutToken = createToken(24);
+  }
+
+  return member.shortcutToken;
+}
+
 export function getSetupSecret() {
   return process.env.PAIR_SETUP_SECRET || process.env.SEND_SECRET;
 }
@@ -72,6 +80,20 @@ export function publicPair(pair) {
   };
 }
 
+export async function getPairByShortcutToken(shortcutToken) {
+  const state = await getState();
+
+  for (const pair of state.pairs) {
+    const member = pair.members.find(item => item.shortcutToken === shortcutToken);
+
+    if (member) {
+      return { pair, member };
+    }
+  }
+
+  return null;
+}
+
 export async function getPairByMemberToken(memberToken) {
   const state = await getState();
 
@@ -114,6 +136,7 @@ export async function registerPairMember({
     existingMember.name = trimmedName;
     existingMember.subscription = subscription;
     existingMember.updatedAt = now;
+    ensureShortcutToken(existingMember);
 
     await saveState(state);
 
@@ -129,6 +152,7 @@ export async function registerPairMember({
 
   const newMember = {
     memberToken: createToken(),
+    shortcutToken: createToken(24),
     name: trimmedName,
     subscription,
     createdAt: now,

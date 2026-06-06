@@ -280,6 +280,18 @@
       display: none;
     }
 
+    .shortcut-box {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(8, 15, 29, 0.28);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text);
+      word-break: break-all;
+      font-family: ui-monospace, "SF Mono", "Menlo", monospace;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
     @media (max-width: 640px) {
       .shell {
         padding: 16px 14px 36px;
@@ -363,6 +375,9 @@
             Отправить любовь ❤️
             <small>один тап и пуш улетел</small>
           </button>
+          <label for="shortcut-url">Ссылка для iPhone Команд</label>
+          <div id="shortcut-url" class="shortcut-box">Появится после регистрации устройства</div>
+          <button id="copy-shortcut" class="secondary">Скопировать ссылку для Команд</button>
           <div id="send-status" class="status"></div>
           <ol id="pair-members" class="pair-members"></ol>
         </div>
@@ -404,6 +419,8 @@
 
     const messageInput = document.getElementById("message");
     const sendButton = document.getElementById("send-love");
+    const copyShortcutButton = document.getElementById("copy-shortcut");
+    const shortcutUrlBox = document.getElementById("shortcut-url");
     const sendStatus = document.getElementById("send-status");
     const pairMembers = document.getElementById("pair-members");
 
@@ -434,6 +451,20 @@
 
     function saveRegistration(registration) {
       localStorage.setItem(REGISTRATION_STORAGE_KEY, JSON.stringify(registration));
+    }
+
+    function getShortcutUrl(registration) {
+      if (!registration?.shortcutToken) {
+        return "";
+      }
+
+      const text = encodeURIComponent(messageInput.value.trim() || "Я тебя люблю");
+      return `https://project-1wk6k.vercel.app/api/send?shortcutToken=${registration.shortcutToken}&text=${text}`;
+    }
+
+    function renderShortcutUrl(registration) {
+      const shortcutUrl = getShortcutUrl(registration);
+      shortcutUrlBox.textContent = shortcutUrl || "Появится после регистрации устройства";
     }
 
     function saveInviteDetails({ pairId, inviteToken }) {
@@ -631,11 +662,13 @@
       const registrationData = {
         inviteToken,
         memberToken: data.memberToken,
+        shortcutToken: data.shortcutToken,
         name,
         pairId
       };
 
       saveRegistration(registrationData);
+      renderShortcutUrl(registrationData);
       renderPair(data.pair, name);
       history.replaceState({}, "", "/");
 
@@ -765,6 +798,28 @@
       }
     };
 
+    copyShortcutButton.onclick = async () => {
+      const registration = loadRegistration();
+      const shortcutUrl = getShortcutUrl(registration);
+
+      if (!shortcutUrl) {
+        setStatus(sendStatus, "Сначала зарегистрируй устройство, чтобы получить shortcut-ссылку", "error");
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(shortcutUrl);
+        renderShortcutUrl(registration);
+        setStatus(sendStatus, "Ссылка для Команд скопирована", "success");
+      } catch {
+        setStatus(sendStatus, "Не удалось скопировать ссылку для Команд", "error");
+      }
+    };
+
+    messageInput.addEventListener("input", () => {
+      renderShortcutUrl(loadRegistration());
+    });
+
     if (savedRegistration) {
       if (savedRegistration.inviteToken && savedRegistration.pairId) {
         pairIdInput.value = savedRegistration.pairId;
@@ -781,6 +836,8 @@
         savedRegistration.name
       );
     }
+
+    renderShortcutUrl(savedRegistration);
 
     if (urlParams.get("pair") && urlParams.get("invite")) {
       saveInviteDetails({

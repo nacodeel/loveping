@@ -1,5 +1,5 @@
 import webpush from "web-push";
-import { getPairByMemberToken, savePair } from "./_lib/pairs.js";
+import { getPairByMemberToken, getPairByShortcutToken, savePair } from "./_lib/pairs.js";
 import { loadState, saveState } from "./_lib/state.js";
 
 webpush.setVapidDetails(
@@ -11,6 +11,7 @@ webpush.setVapidDetails(
 export default async function handler(req, res) {
   const secret = req.method === "POST" ? req.body?.secret : req.query.secret;
   const memberToken = req.method === "POST" ? req.body?.memberToken : req.query.memberToken;
+  const shortcutToken = req.method === "POST" ? req.body?.shortcutToken : req.query.shortcutToken;
 
   if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) {
     return res.status(500).json({
@@ -24,8 +25,10 @@ export default async function handler(req, res) {
     text = "Я тебя люблю";
   }
 
-  if (memberToken) {
-    const pairResult = await getPairByMemberToken(memberToken);
+  if (memberToken || shortcutToken) {
+    const pairResult = memberToken
+      ? await getPairByMemberToken(memberToken)
+      : await getPairByShortcutToken(shortcutToken);
 
     if (!pairResult) {
       return res.status(404).json({
