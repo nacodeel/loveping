@@ -1,0 +1,9 @@
+{
+  "name": "Love Push",
+  "short_name": "Love",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ff4f8b",
+  "icons": []
+}
