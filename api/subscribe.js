@@ -1,4 +1,4 @@
-import { kv } from "@vercel/kv";
+import { loadState, saveState } from "./_lib/state.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -11,10 +11,12 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Invalid subscription" });
   }
 
-  await kv.set("girl_subscription", {
+  const state = await loadState();
+  state.legacySubscription = {
     ...subscription,
     savedAt: new Date().toISOString()
-  });
+  };
+  await saveState(state);
 
   return res.status(200).json({ success: true });
 }

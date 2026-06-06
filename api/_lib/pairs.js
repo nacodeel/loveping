@@ -1,7 +1,5 @@
-import { kv } from "@vercel/kv";
 import { randomBytes } from "node:crypto";
-
-const STATE_KEY = "love_push_state";
+import { loadState, saveState } from "./state.js";
 
 function createToken(size = 18) {
   return randomBytes(size).toString("base64url");
@@ -16,21 +14,19 @@ export function getSetupSecret() {
 }
 
 async function getState() {
-  const state = await kv.get(STATE_KEY);
+  const state = await loadState();
 
   if (!state || typeof state !== "object") {
     return {
-      pairs: []
+      pairs: [],
+      legacySubscription: null
     };
   }
 
   return {
-    pairs: Array.isArray(state.pairs) ? state.pairs : []
+    pairs: Array.isArray(state.pairs) ? state.pairs : [],
+    legacySubscription: state.legacySubscription || null
   };
-}
-
-async function saveState(state) {
-  await kv.set(STATE_KEY, state);
 }
 
 export async function createPairRecord() {

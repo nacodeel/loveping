@@ -1,7 +1,7 @@
 {
   "type": "module",
   "dependencies": {
-    "@vercel/kv": "latest",
+    "@vercel/blob": "latest",
     "web-push": "latest"
   }
 }

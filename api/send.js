@@ -1,6 +1,6 @@
-import { kv } from "@vercel/kv";
 import webpush from "web-push";
 import { getPairByMemberToken, savePair } from "./_lib/pairs.js";
+import { loadState, saveState } from "./_lib/state.js";
 
 webpush.setVapidDetails(
   process.env.VAPID_SUBJECT || "mailto:you@example.com",
@@ -91,7 +91,8 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: "Forbidden" });
   }
 
-  const subscription = await kv.get("girl_subscription");
+  const state = await loadState();
+  const subscription = state.legacySubscription;
 
   if (!subscription) {
     return res.status(404).json({
@@ -111,7 +112,8 @@ export default async function handler(req, res) {
     );
   } catch (error) {
     if (error.statusCode === 404 || error.statusCode === 410) {
-      await kv.del("girl_subscription");
+      state.legacySubscription = null;
+      await saveState(state);
     }
 
     return res.status(error.statusCode || 500).json({
