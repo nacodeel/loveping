@@ -2,6 +2,23 @@ import { get, put } from "@vercel/blob";
 
 const STATE_PATHNAME = "love-push/state.json";
 
+function getBlobAuthOptions() {
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    return {
+      token: process.env.BLOB_READ_WRITE_TOKEN
+    };
+  }
+
+  if (process.env.BLOB_STORE_ID && process.env.VERCEL_OIDC_TOKEN) {
+    return {
+      storeId: process.env.BLOB_STORE_ID,
+      oidcToken: process.env.VERCEL_OIDC_TOKEN
+    };
+  }
+
+  return {};
+}
+
 function createInitialState() {
   return {
     pairs: [],
@@ -17,7 +34,8 @@ async function readStreamAsText(stream) {
 export async function loadState() {
   try {
     const result = await get(STATE_PATHNAME, {
-      access: "private"
+      access: "private",
+      ...getBlobAuthOptions()
     });
 
     if (!result || result.statusCode === 404) {
@@ -44,6 +62,7 @@ export async function saveState(state) {
   await put(STATE_PATHNAME, JSON.stringify(state, null, 2), {
     access: "private",
     allowOverwrite: true,
-    contentType: "application/json"
+    contentType: "application/json",
+    ...getBlobAuthOptions()
   });
 }
