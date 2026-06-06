@@ -643,25 +643,43 @@
     }
 
     async function sendLove() {
-      const registration = loadRegistration();
+      let registration = loadRegistration();
 
       if (!registration?.memberToken) {
-        throw new Error("Сначала зарегистрируй устройство в паре");
+        if (registration?.pairId && registration?.inviteToken && registration?.name) {
+          await registerDevice();
+          registration = loadRegistration();
+        } else {
+          throw new Error("Сначала зарегистрируй устройство в паре");
+        }
       }
 
       const text = messageInput.value.trim() || "Я тебя люблю";
-      const response = await fetch("/api/send", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json"
-        },
-        body: JSON.stringify({
-          memberToken: registration.memberToken,
-          text
-        })
-      });
 
-      const data = await response.json();
+      async function callSend(activeRegistration) {
+        const response = await fetch("/api/send", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json"
+          },
+          body: JSON.stringify({
+            memberToken: activeRegistration.memberToken,
+            text
+          })
+        });
+
+        const data = await response.json();
+
+        return { response, data };
+      }
+
+      let { response, data } = await callSend(registration);
+
+      if (!response.ok && data?.error === "Устройство не зарегистрировано в паре") {
+        await registerDevice({ forceRefresh: true });
+        registration = loadRegistration();
+        ({ response, data } = await callSend(registration));
+      }
 
       if (!response.ok) {
         throw new Error(data.error || data.details || "Не удалось отправить пуш");
