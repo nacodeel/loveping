@@ -8,6 +8,27 @@ webpush.setVapidDetails(
   process.env.VAPID_PRIVATE_KEY
 );
 
+function buildNotificationPayload({ senderName, text }) {
+  const trimmedText = typeof text === "string" ? text.trim() : "";
+  const defaultText = "Я тебя люблю";
+
+  if (senderName) {
+    return {
+      title: `Я тебя люблю от ${senderName}!`,
+      body: trimmedText || defaultText,
+      icon: "/icon-heart.svg",
+      badge: "/badge-heart.svg"
+    };
+  }
+
+  return {
+    title: "Я тебя люблю ❤️",
+    body: trimmedText || defaultText,
+    icon: "/icon-heart.svg",
+    badge: "/badge-heart.svg"
+  };
+}
+
 export default async function handler(req, res) {
   const secret = req.method === "POST" ? req.body?.secret : req.query.secret;
   const memberToken = req.method === "POST" ? req.body?.memberToken : req.query.memberToken;
@@ -54,14 +75,14 @@ export default async function handler(req, res) {
       }
 
       try {
+        const payload = buildNotificationPayload({
+          senderName: member.name,
+          text
+        });
+
         await webpush.sendNotification(
           recipient.subscription,
-          JSON.stringify({
-            title: "Я тебя люблю",
-            body: text,
-            icon: "/icon-heart.svg",
-            badge: "/badge-heart.svg"
-          })
+          JSON.stringify(payload)
         );
 
         deliveredTo += 1;
@@ -104,14 +125,14 @@ export default async function handler(req, res) {
   }
 
   try {
+    const payload = buildNotificationPayload({
+      senderName: "",
+      text
+    });
+
     await webpush.sendNotification(
       subscription,
-      JSON.stringify({
-        title: "Я тебя люблю",
-        body: text,
-        icon: "/icon-heart.svg",
-        badge: "/badge-heart.svg"
-      })
+      JSON.stringify(payload)
     );
   } catch (error) {
     if (error.statusCode === 404 || error.statusCode === 410) {
