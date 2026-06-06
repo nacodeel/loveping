@@ -1,0 +1,14 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="128" fill="url(#bg)"/>
+  <circle cx="398" cy="110" r="74" fill="white" fill-opacity="0.12"/>
+  <circle cx="118" cy="420" r="92" fill="white" fill-opacity="0.08"/>
+  <path d="M256 359C246.961 352.202 237.448 344.831 227.46 336.889C197.857 313.415 174.231 290.593 156.583 268.425C138.935 246.258 130.111 224.077 130.111 201.882C130.111 179.686 137.267 161.694 151.578 147.905C165.89 134.117 183.538 127.222 204.522 127.222C216.44 127.222 227.73 129.698 238.393 134.649C249.056 139.6 258.258 146.625 266 155.724C273.742 146.625 282.944 139.6 293.607 134.649C304.27 129.698 315.56 127.222 327.478 127.222C348.462 127.222 366.11 134.117 380.422 147.905C394.733 161.694 401.889 179.686 401.889 201.882C401.889 224.077 393.065 246.258 375.417 268.425C357.769 290.593 334.143 313.415 304.54 336.889C294.552 344.831 285.039 352.202 276 359L266 366.5L256 359Z" fill="white"/>
+  <text x="256" y="444" text-anchor="middle" fill="white" font-family="Avenir Next, Arial, sans-serif" font-size="38" font-weight="700">Я тебя люблю</text>
+  <defs>
+    <linearGradient id="bg" x1="62" y1="54" x2="440" y2="470" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF5F8F"/>
+      <stop offset="0.55" stop-color="#FF7A59"/>
+      <stop offset="1" stop-color="#FFB36B"/>
+    </linearGradient>
+  </defs>
+</svg>

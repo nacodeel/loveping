@@ -11,7 +11,10 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Invalid subscription" });
   }
 
-  await kv.set("girl_subscription", subscription);
+  await kv.set("girl_subscription", {
+    ...subscription,
+    savedAt: new Date().toISOString()
+  });
 
   return res.status(200).json({ success: true });
 }

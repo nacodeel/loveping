@@ -2,16 +2,464 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Love Push</title>
   <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/icon-heart.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/icon-heart.svg" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Love Push" />
   <meta name="theme-color" content="#ff4f8b" />
+  <style>
+    :root {
+      --bg-top: #2d0f2f;
+      --bg-bottom: #0f172a;
+      --glass: rgba(255, 255, 255, 0.14);
+      --text: #fff7fb;
+      --muted: rgba(255, 247, 251, 0.74);
+      --accent: #ff5f8f;
+      --accent-2: #ffb36b;
+      --success: #6ee7b7;
+      --danger: #fecaca;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Avenir Next", "SF Pro Display", "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top, rgba(255, 95, 143, 0.4), transparent 32%),
+        radial-gradient(circle at 85% 18%, rgba(255, 179, 107, 0.22), transparent 18%),
+        linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+    }
+
+    .shell {
+      width: min(100%, 1040px);
+      margin: 0 auto;
+      padding: 24px 18px 48px;
+    }
+
+    .hero,
+    .card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.07));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 28px;
+      border-radius: 34px;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -120px auto;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 95, 143, 0.4), transparent 70%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--accent-2);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(40px, 8vw, 72px);
+      line-height: 0.95;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 24px;
+    }
+
+    p {
+      line-height: 1.55;
+    }
+
+    .lead {
+      max-width: 660px;
+      margin: 16px 0 0;
+      font-size: 18px;
+      color: var(--muted);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.08);
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .card {
+      padding: 22px;
+      border-radius: var(--radius-xl);
+    }
+
+    .card p,
+    .hint,
+    .steps,
+    .pair-members {
+      color: var(--muted);
+    }
+
+    .stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    button,
+    textarea,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: 0;
+      border-radius: 18px;
+      transition: transform 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(1px) scale(0.995);
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .primary {
+      padding: 16px 18px;
+      color: white;
+      background: linear-gradient(135deg, var(--accent), #ff7a59);
+      box-shadow: 0 16px 40px rgba(255, 95, 143, 0.35);
+      font-weight: 700;
+    }
+
+    .secondary {
+      padding: 14px 16px;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .love-button {
+      min-height: 168px;
+      border-radius: 28px;
+      font-size: clamp(28px, 5vw, 42px);
+      font-weight: 800;
+      background:
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.24), transparent 42%),
+        linear-gradient(135deg, #ff4f8b, #ff7a59 52%, #ffb36b);
+      color: white;
+      box-shadow: 0 22px 60px rgba(255, 95, 143, 0.38);
+    }
+
+    .love-button small {
+      display: block;
+      margin-top: 8px;
+      font-size: 15px;
+      font-weight: 500;
+      opacity: 0.88;
+    }
+
+    label {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    textarea,
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(8, 15, 29, 0.28);
+      color: var(--text);
+      outline: none;
+    }
+
+    textarea {
+      min-height: 104px;
+      resize: vertical;
+    }
+
+    .status {
+      min-height: 24px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .status.success {
+      color: var(--success);
+    }
+
+    .status.error {
+      color: var(--danger);
+    }
+
+    .hint {
+      font-size: 13px;
+    }
+
+    .steps {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding-left: 18px;
+      line-height: 1.55;
+    }
+
+    .mono,
+    .invite-link {
+      font-family: ui-monospace, "SF Mono", "Menlo", monospace;
+      word-break: break-all;
+    }
+
+    .invite-link {
+      display: block;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(8, 15, 29, 0.28);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .pair-members {
+      margin: 0;
+      padding-left: 18px;
+      line-height: 1.55;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 640px) {
+      .shell {
+        padding: 16px 14px 36px;
+      }
+
+      .hero,
+      .card {
+        padding: 18px;
+        border-radius: 24px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h1>Love Push ❤️</h1>
-  <button id="subscribe">Разрешить уведомления</button>
+  <main class="shell">
+    <section class="hero">
+      <p class="eyebrow">Private Pair Push</p>
+      <h1>Love Push</h1>
+      <p class="lead">
+        Создай одну уникальную ссылку-приглашение, отправь её любимому человеку и свяжи только ваши
+        два устройства. После регистрации каждый из вас сможет в один тап отправлять пуш другому.
+      </p>
+      <div class="pill-row">
+        <span class="pill">Только для вашей пары</span>
+        <span class="pill">Работает через Vercel + Web Push</span>
+        <span class="pill">Можно вынести на экран iPhone</span>
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <h2>1. Создать приглашение</h2>
+        <p>
+          Это делаешь ты один раз. Введи секрет настройки, создай пару и отправь полученную ссылку.
+        </p>
+        <div class="stack">
+          <label for="setup-secret">Секрет настройки пары</label>
+          <input id="setup-secret" type="password" placeholder="PAIR_SETUP_SECRET или SEND_SECRET" autocomplete="off" />
+          <button id="create-pair" class="primary">Создать ссылку для пары</button>
+          <a id="invite-link" class="invite-link hidden" href="#"></a>
+          <button id="copy-invite" class="secondary hidden">Скопировать ссылку</button>
+          <div id="create-status" class="status"></div>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>2. Подключить устройство</h2>
+        <p>
+          Открой эту страницу по ссылке-приглашению. На iPhone лучше сначала добавить её на экран
+          «Домой», а уже потом нажимать регистрацию.
+        </p>
+        <div class="stack">
+          <label for="display-name">Как тебя подписать в паре</label>
+          <input id="display-name" type="text" placeholder="Например: Никита" autocomplete="off" />
+          <button id="register-device" class="primary">Привязать это устройство ❤️</button>
+          <button id="refresh-device" class="secondary">Обновить подписку на этом устройстве</button>
+          <div id="register-status" class="status"></div>
+          <p id="pair-summary" class="hint"></p>
+        </div>
+      </article>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <h2>3. Отправить любовь</h2>
+        <p>
+          После регистрации устройства здесь появляется большая кнопка. Нажимаешь и пуш уходит
+          только второму участнику вашей пары.
+        </p>
+        <div class="stack">
+          <label for="message">Текст уведомления</label>
+          <textarea id="message" placeholder="Я тебя люблю">Я тебя люблю</textarea>
+          <button id="send-love" class="love-button">
+            Отправить любовь ❤️
+            <small>один тап и пуш улетел</small>
+          </button>
+          <div id="send-status" class="status"></div>
+          <ol id="pair-members" class="pair-members"></ol>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>Как поставить на iPhone</h2>
+        <ol class="steps">
+          <li>Открой страницу в Safari.</li>
+          <li>Нажми «Поделиться» → «На экран Домой».</li>
+          <li>Открой иконку с домашнего экрана.</li>
+          <li>Для первого входа зарегистрируй устройство по ссылке-приглашению.</li>
+          <li>Потом открывай иконку и жми большую кнопку отправки.</li>
+        </ol>
+      </article>
+    </section>
+  </main>
 
   <script>
-    const VAPID_PUBLIC_KEY = "ВСТАВЬ_СЮДА_PUBLIC_KEY";
+    const CREATE_SECRET_STORAGE_KEY = "love-push-setup-secret";
+    const REGISTRATION_STORAGE_KEY = "love-push-registration";
+    const urlParams = new URLSearchParams(window.location.search);
+
+    const setupSecretInput = document.getElementById("setup-secret");
+    const createPairButton = document.getElementById("create-pair");
+    const inviteLink = document.getElementById("invite-link");
+    const copyInviteButton = document.getElementById("copy-invite");
+    const createStatus = document.getElementById("create-status");
+
+    const displayNameInput = document.getElementById("display-name");
+    const registerButton = document.getElementById("register-device");
+    const refreshButton = document.getElementById("refresh-device");
+    const registerStatus = document.getElementById("register-status");
+    const pairSummary = document.getElementById("pair-summary");
+
+    const messageInput = document.getElementById("message");
+    const sendButton = document.getElementById("send-love");
+    const sendStatus = document.getElementById("send-status");
+    const pairMembers = document.getElementById("pair-members");
+
+    const savedSecret = localStorage.getItem(CREATE_SECRET_STORAGE_KEY);
+    const savedRegistration = loadRegistration();
+
+    if (savedSecret) {
+      setupSecretInput.value = savedSecret;
+    }
+
+    if (savedRegistration?.name) {
+      displayNameInput.value = savedRegistration.name;
+    }
+
+    function loadRegistration() {
+      const raw = localStorage.getItem(REGISTRATION_STORAGE_KEY);
+
+      if (!raw) {
+        return null;
+      }
+
+      try {
+        return JSON.parse(raw);
+      } catch {
+        return null;
+      }
+    }
+
+    function saveRegistration(registration) {
+      localStorage.setItem(REGISTRATION_STORAGE_KEY, JSON.stringify(registration));
+    }
+
+    function setStatus(element, message, type = "") {
+      element.textContent = message;
+      element.className = `status${type ? " " + type : ""}`;
+    }
+
+    function renderPair(pair, currentMemberName) {
+      if (!pair) {
+        pairMembers.innerHTML = "";
+        pairSummary.textContent = "";
+        return;
+      }
+
+      pairSummary.textContent = `Пара: ${pair.id}. Участников подключено: ${pair.members.length}/2`;
+      pairMembers.innerHTML = pair.members
+        .map(member => `<li>${member.name}${member.name === currentMemberName ? " (это ты)" : ""}</li>`)
+        .join("");
+    }
+
+    function getActivePairId() {
+      return urlParams.get("pair") || savedRegistration?.pairId || "";
+    }
+
+    function getActiveInviteToken() {
+      return urlParams.get("invite") || savedRegistration?.inviteToken || "";
+    }
+
+    async function loadConfig() {
+      const response = await fetch("/api/config");
+
+      if (!response.ok) {
+        throw new Error("Не удалось загрузить публичный VAPID ключ");
+      }
+
+      return response.json();
+    }
 
     function urlBase64ToUint8Array(base64String) {
       const padding = "=".repeat((4 - base64String.length % 4) % 4);
@@ -23,31 +471,213 @@
       return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
     }
 
-    document.getElementById("subscribe").onclick = async () => {
+    async function ensureSubscription({ forceRefresh = false } = {}) {
+      if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+        throw new Error("Этот браузер не поддерживает push-уведомления");
+      }
+
+      const { vapidPublicKey } = await loadConfig();
       const registration = await navigator.serviceWorker.register("/sw.js");
+      await navigator.serviceWorker.ready;
 
       const permission = await Notification.requestPermission();
 
       if (permission !== "granted") {
-        alert("Уведомления не разрешены");
-        return;
+        throw new Error("Нужно разрешить уведомления");
       }
 
-      const subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-      });
+      const currentSubscription = await registration.pushManager.getSubscription();
 
-      await fetch("/api/subscribe", {
+      if (currentSubscription && forceRefresh) {
+        await currentSubscription.unsubscribe();
+      }
+
+      if (currentSubscription && !forceRefresh) {
+        return currentSubscription;
+      }
+
+      return registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
+      });
+    }
+
+    async function createPair() {
+      const secret = setupSecretInput.value.trim();
+
+      if (!secret) {
+        throw new Error("Введи секрет настройки пары");
+      }
+
+      const response = await fetch("/api/pairs/create", {
         method: "POST",
         headers: {
           "content-type": "application/json"
         },
-        body: JSON.stringify(subscription)
+        body: JSON.stringify({ secret })
       });
 
-      alert("Готово! Теперь уведомления будут приходить сюда ❤️");
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Не удалось создать пару");
+      }
+
+      localStorage.setItem(CREATE_SECRET_STORAGE_KEY, secret);
+      return data;
+    }
+
+    async function registerDevice({ forceRefresh = false } = {}) {
+      const pairId = getActivePairId();
+      const inviteToken = getActiveInviteToken();
+      const name = displayNameInput.value.trim();
+
+      if (!pairId || !inviteToken) {
+        throw new Error("Открой страницу именно по ссылке-приглашению");
+      }
+
+      if (!name) {
+        throw new Error("Введи имя для этого устройства");
+      }
+
+      const subscription = await ensureSubscription({ forceRefresh });
+      const currentRegistration = loadRegistration();
+
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({
+          pairId,
+          inviteToken,
+          name,
+          memberToken: currentRegistration?.memberToken,
+          subscription
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Не удалось зарегистрировать устройство");
+      }
+
+      const registrationData = {
+        inviteToken,
+        memberToken: data.memberToken,
+        name,
+        pairId
+      };
+
+      saveRegistration(registrationData);
+      renderPair(data.pair, name);
+      history.replaceState({}, "", "/");
+
+      return data;
+    }
+
+    async function sendLove() {
+      const registration = loadRegistration();
+
+      if (!registration?.memberToken) {
+        throw new Error("Сначала зарегистрируй устройство в паре");
+      }
+
+      const text = messageInput.value.trim() || "Я тебя люблю";
+      const response = await fetch("/api/send", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({
+          memberToken: registration.memberToken,
+          text
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || data.details || "Не удалось отправить пуш");
+      }
+
+      return data;
+    }
+
+    createPairButton.onclick = async () => {
+      setStatus(createStatus, "Создаю ссылку...");
+
+      try {
+        const result = await createPair();
+        inviteLink.href = result.inviteUrl;
+        inviteLink.textContent = result.inviteUrl;
+        inviteLink.classList.remove("hidden");
+        copyInviteButton.classList.remove("hidden");
+        setStatus(createStatus, "Ссылка готова. Её можно отправлять ❤️", "success");
+        renderPair(result.pair, "");
+      } catch (error) {
+        setStatus(createStatus, error.message, "error");
+      }
     };
+
+    copyInviteButton.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(inviteLink.textContent);
+        setStatus(createStatus, "Ссылка скопирована", "success");
+      } catch {
+        setStatus(createStatus, "Не удалось скопировать ссылку", "error");
+      }
+    };
+
+    registerButton.onclick = async () => {
+      setStatus(registerStatus, "Подключаю устройство...");
+
+      try {
+        const result = await registerDevice();
+        setStatus(registerStatus, "Устройство привязано к вашей паре ❤️", "success");
+        renderPair(result.pair, displayNameInput.value.trim());
+      } catch (error) {
+        setStatus(registerStatus, error.message, "error");
+      }
+    };
+
+    refreshButton.onclick = async () => {
+      setStatus(registerStatus, "Обновляю подписку...");
+
+      try {
+        const result = await registerDevice({ forceRefresh: true });
+        setStatus(registerStatus, "Подписка обновлена ❤️", "success");
+        renderPair(result.pair, displayNameInput.value.trim());
+      } catch (error) {
+        setStatus(registerStatus, error.message, "error");
+      }
+    };
+
+    sendButton.onclick = async () => {
+      setStatus(sendStatus, "Отправляю любовь...");
+
+      try {
+        const result = await sendLove();
+        setStatus(sendStatus, `Готово. Получателей: ${result.deliveredTo}`, "success");
+      } catch (error) {
+        setStatus(sendStatus, error.message, "error");
+      }
+    };
+
+    if (savedRegistration) {
+      renderPair(
+        {
+          id: savedRegistration.pairId,
+          members: [{ name: savedRegistration.name }]
+        },
+        savedRegistration.name
+      );
+    }
+
+    if (urlParams.get("pair") && urlParams.get("invite")) {
+      setStatus(registerStatus, "Ссылка приглашения распознана. Осталось нажать регистрацию.", "success");
+    }
   </script>
 </body>
 </html>
