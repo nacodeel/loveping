@@ -4,9 +4,9 @@ export default async function handler(req, res) {
   const payload = req.method === "POST" ? req.body || {} : req.query || {};
   const result = await sendLoveMessage({
     memberToken: payload.memberToken,
-    shortcutToken: payload.shortcutToken,
+    shortcutToken: payload.t || payload.shortcutToken,
     secret: payload.secret,
-    text: payload.text
+    text: payload.text || payload.m
   });
 
   return res.status(result.status).json(result.body);

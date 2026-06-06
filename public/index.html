@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Love Push</title>
+  <title>LovePush</title>
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" href="/icon-heart.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="/icon-heart.svg" />
@@ -319,10 +319,10 @@
   <main class="shell">
     <section class="hero">
       <p class="eyebrow">LovePush</p>
-      <h1>Love Push</h1>
+      <h1>LovePush</h1>
       <p class="lead">
-        Простая личная кнопка любви для вас двоих. Подключаете пару один раз, а потом отправляете
-        пуш в одно нажатие или через Команды на iPhone.
+        Простая личная кнопка любви для вас двоих. Один раз соединяете пару, потом отправляете пуш
+        в один тап или через Команды на iPhone.
       </p>
       <div class="pill-row">
         <span class="pill">Только для вашей пары</span>
@@ -339,7 +339,7 @@
           Делается один раз. Создай пару и отправь ссылку любимому человеку.
         </p>
         <div class="stack">
-          <label for="setup-secret">Секрет настройки пары</label>
+          <label for="setup-secret">Секрет настройки</label>
           <input id="setup-secret" type="password" placeholder="PAIR_SETUP_SECRET или SEND_SECRET" autocomplete="off" />
           <button id="create-pair" class="primary">Создать ссылку для пары</button>
           <a id="invite-link" class="invite-link hidden" href="#"></a>
@@ -357,20 +357,19 @@
         <div class="stack">
           <label for="pair-id">Код пары</label>
           <input id="pair-id" type="text" placeholder="Например: c546d5d2f51a8111" autocomplete="off" />
-          <label for="invite-token">Токен приглашения</label>
+          <label for="invite-token">Код приглашения</label>
           <input id="invite-token" type="text" placeholder="Например: jxYH_sh_a-8E7jLH" autocomplete="off" />
-          <label for="invite-url">Или полная ссылка</label>
+          <label for="invite-url">Или целая ссылка</label>
           <input id="invite-url" type="text" placeholder="Можно вставить полную ссылку, если так удобнее" autocomplete="off" />
-          <button id="apply-invite" class="secondary">Применить данные приглашения</button>
+          <button id="apply-invite" class="secondary">Подтянуть данные из ссылки</button>
           <label for="display-name">Твоё имя в паре</label>
           <input id="display-name" type="text" placeholder="Например: Никита" autocomplete="off" />
-          <label for="notification-name">Как ты будешь называться в пушах</label>
-          <input id="notification-name" type="text" placeholder="Например: Котёнок" autocomplete="off" />
-          <p class="mini-note">Это имя увидит второй человек в уведомлении.</p>
+          <label for="partner-alias">Как этот человек будет называться у тебя</label>
+          <input id="partner-alias" type="text" placeholder="Например: Котёнок" autocomplete="off" />
+          <p class="mini-note">Только для тебя. Если поле пустое, будет показываться её обычное имя.</p>
           <button id="register-device" class="primary">Привязать это устройство ❤️</button>
           <button id="refresh-device" class="secondary">Обновить подписку на этом устройстве</button>
           <div id="register-status" class="status"></div>
-          <p id="pair-summary" class="hint"></p>
         </div>
       </article>
     </section>
@@ -379,9 +378,7 @@
       <article class="card">
         <p class="section-label">Шаг 3</p>
         <h2>3. Отправить любовь</h2>
-        <p>
-          Если текст пустой, уйдёт простой пуш. Если заполнишь поле, в уведомлении появится твой текст.
-        </p>
+        <p>По умолчанию уйдёт простой пуш. Свой текст можно добавить по желанию.</p>
         <div class="stack">
           <label for="message">Свой текст для пуша (необязательно)</label>
           <textarea id="message" placeholder="Например: Спокойной ночи, любимая ❤️"></textarea>
@@ -389,11 +386,10 @@
             Отправить любовь ❤️
             <small>один тап и пуш улетел</small>
           </button>
-          <label for="shortcut-url">Ссылка для iPhone Команд</label>
+          <label for="shortcut-url">Короткая ссылка для iPhone Команд</label>
           <div id="shortcut-url" class="shortcut-box">Появится после регистрации устройства</div>
           <button id="copy-shortcut" class="secondary">Скопировать ссылку для Команд</button>
           <div id="send-status" class="status"></div>
-          <ol id="pair-members" class="pair-members"></ol>
         </div>
       </article>
 
@@ -407,6 +403,7 @@
           <li>Для первого входа зарегистрируй устройство по ссылке-приглашению.</li>
           <li>Потом открывай иконку и жми большую кнопку отправки.</li>
         </ol>
+        <p class="mini-note">Для Команд на iPhone можно просто вставить короткую ссылку из блока выше в действие «Получить содержимое URL».</p>
       </article>
     </section>
   </main>
@@ -423,7 +420,7 @@
     const createStatus = document.getElementById("create-status");
 
     const displayNameInput = document.getElementById("display-name");
-    const notificationNameInput = document.getElementById("notification-name");
+    const partnerAliasInput = document.getElementById("partner-alias");
     const pairIdInput = document.getElementById("pair-id");
     const inviteTokenInput = document.getElementById("invite-token");
     const inviteUrlInput = document.getElementById("invite-url");
@@ -431,15 +428,12 @@
     const registerButton = document.getElementById("register-device");
     const refreshButton = document.getElementById("refresh-device");
     const registerStatus = document.getElementById("register-status");
-    const pairSummary = document.getElementById("pair-summary");
 
     const messageInput = document.getElementById("message");
     const sendButton = document.getElementById("send-love");
     const copyShortcutButton = document.getElementById("copy-shortcut");
     const shortcutUrlBox = document.getElementById("shortcut-url");
     const sendStatus = document.getElementById("send-status");
-    const pairMembers = document.getElementById("pair-members");
-
     const savedSecret = localStorage.getItem(CREATE_SECRET_STORAGE_KEY);
     const savedRegistration = loadRegistration();
 
@@ -451,8 +445,10 @@
       displayNameInput.value = savedRegistration.name;
     }
 
-    if (savedRegistration?.notificationName) {
-      notificationNameInput.value = savedRegistration.notificationName;
+    if (savedRegistration?.partnerAlias) {
+      partnerAliasInput.value = savedRegistration.partnerAlias;
+    } else if (savedRegistration?.notificationName) {
+      partnerAliasInput.value = savedRegistration.notificationName;
     }
 
     function loadRegistration() {
@@ -478,11 +474,11 @@
         return "";
       }
 
-      const shortcutUrl = new URL("https://project-1wk6k.vercel.app/api/send");
-      shortcutUrl.searchParams.set("shortcutToken", registration.shortcutToken);
+      const shortcutUrl = new URL("https://project-1wk6k.vercel.app/api/love");
+      shortcutUrl.searchParams.set("t", registration.shortcutToken);
 
       if (messageInput.value.trim()) {
-        shortcutUrl.searchParams.set("text", messageInput.value.trim());
+        shortcutUrl.searchParams.set("m", messageInput.value.trim());
       }
 
       return shortcutUrl.toString();
@@ -511,15 +507,8 @@
 
     function renderPair(pair, currentMemberName) {
       if (!pair) {
-        pairMembers.innerHTML = "";
-        pairSummary.textContent = "";
         return;
       }
-
-      pairSummary.textContent = `Пара: ${pair.id}. Участников подключено: ${pair.members.length}/2`;
-      pairMembers.innerHTML = pair.members
-        .map(member => `<li>${member.name}${member.name === currentMemberName ? " (это ты)" : ""}</li>`)
-        .join("");
     }
 
     function getActivePairId() {
@@ -653,7 +642,7 @@
       const pairId = getActivePairId();
       const inviteToken = getActiveInviteToken();
       const name = displayNameInput.value.trim();
-      const notificationName = notificationNameInput.value.trim() || name;
+      const partnerAlias = partnerAliasInput.value.trim();
 
       if (!pairId || !inviteToken) {
         throw new Error("Открой страницу именно по ссылке-приглашению");
@@ -675,7 +664,7 @@
           pairId,
           inviteToken,
           name,
-          notificationName,
+          partnerAlias,
           memberToken: currentRegistration?.memberToken,
           subscription
         })
@@ -692,7 +681,7 @@
         memberToken: data.memberToken,
         shortcutToken: data.shortcutToken,
         name,
-        notificationName,
+        partnerAlias,
         pairId
       };
 
@@ -857,17 +846,11 @@
           `https://project-1wk6k.vercel.app/?pair=${savedRegistration.pairId}&invite=${savedRegistration.inviteToken}`;
       }
 
-      if (savedRegistration.notificationName) {
-        notificationNameInput.value = savedRegistration.notificationName;
+      if (savedRegistration.partnerAlias) {
+        partnerAliasInput.value = savedRegistration.partnerAlias;
+      } else if (savedRegistration.notificationName) {
+        partnerAliasInput.value = savedRegistration.notificationName;
       }
-
-      renderPair(
-        {
-          id: savedRegistration.pairId,
-          members: [{ name: savedRegistration.name }]
-        },
-        savedRegistration.name
-      );
     }
 
     renderShortcutUrl(savedRegistration);

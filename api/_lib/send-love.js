@@ -12,11 +12,29 @@ webpush.setVapidDetails(
   process.env.VAPID_PRIVATE_KEY
 );
 
+const MAX_SENDER_NAME_LENGTH = 24;
+const MAX_BODY_LENGTH = 120;
+const MAX_TITLE_LENGTH = 60;
+
+function truncateText(value, maxLength) {
+  const normalizedValue = typeof value === "string" ? value.trim() : "";
+
+  if (!normalizedValue || normalizedValue.length <= maxLength) {
+    return normalizedValue;
+  }
+
+  return `${normalizedValue.slice(0, maxLength - 1)}…`;
+}
+
 function buildNotificationPayload({ senderName, text }) {
-  const trimmedText = typeof text === "string" ? text.trim() : "";
+  const safeSenderName = truncateText(senderName, MAX_SENDER_NAME_LENGTH);
+  const trimmedText = truncateText(text, MAX_BODY_LENGTH);
+  const title = safeSenderName
+    ? truncateText(`Я тебя люблю от ${safeSenderName}`, MAX_TITLE_LENGTH)
+    : "Я тебя люблю";
 
   return {
-    title: "Я тебя люблю",
+    title,
     body: trimmedText,
     icon: "/icon-heart.svg",
     badge: "/badge-heart.svg"
@@ -70,8 +88,9 @@ export async function sendLoveMessage({ memberToken, shortcutToken, secret, text
       }
 
       try {
+        const senderLabel = recipient.partnerAlias || member.name;
         const payload = buildNotificationPayload({
-          senderName: member.name,
+          senderName: senderLabel,
           text: normalizedText
         });
 
