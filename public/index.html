@@ -411,6 +411,7 @@
   <script>
     const CREATE_SECRET_STORAGE_KEY = "love-push-setup-secret";
     const REGISTRATION_STORAGE_KEY = "love-push-registration";
+    const AUTO_SYNC_INTERVAL_MS = 15 * 60 * 1000;
     const urlParams = new URLSearchParams(window.location.search);
 
     const setupSecretInput = document.getElementById("setup-secret");
@@ -503,6 +504,14 @@
     function setStatus(element, message, type = "") {
       element.textContent = message;
       element.className = `status${type ? " " + type : ""}`;
+    }
+
+    function hasSavedRegistrationData(registration = loadRegistration()) {
+      return Boolean(
+        registration?.pairId &&
+        registration?.inviteToken &&
+        registration?.name
+      );
     }
 
     function renderPair(pair, currentMemberName) {
@@ -696,8 +705,13 @@
     async function sendLove() {
       let registration = loadRegistration();
 
+      if (hasSavedRegistrationData(registration)) {
+        await autoSyncRegistration();
+        registration = loadRegistration();
+      }
+
       if (!registration?.memberToken) {
-        if (registration?.pairId && registration?.inviteToken && registration?.name) {
+        if (hasSavedRegistrationData(registration)) {
           await registerDevice();
           registration = loadRegistration();
         } else {
@@ -737,6 +751,45 @@
       }
 
       return data;
+    }
+
+    let autoSyncInFlight = null;
+
+    async function autoSyncRegistration({ forceRefresh = false } = {}) {
+      if (autoSyncInFlight) {
+        return autoSyncInFlight;
+      }
+
+      const registration = loadRegistration();
+
+      if (!hasSavedRegistrationData(registration)) {
+        return null;
+      }
+
+      if (!("serviceWorker" in navigator) || !("PushManager" in window) || Notification.permission === "denied") {
+        return null;
+      }
+
+      autoSyncInFlight = (async () => {
+        try {
+          if (registration.name && !displayNameInput.value.trim()) {
+            displayNameInput.value = registration.name;
+          }
+
+          if (registration.partnerAlias && !partnerAliasInput.value.trim()) {
+            partnerAliasInput.value = registration.partnerAlias;
+          }
+
+          await registerDevice({ forceRefresh });
+          renderShortcutUrl(loadRegistration());
+        } catch (error) {
+          console.warn("Auto sync skipped:", error);
+        } finally {
+          autoSyncInFlight = null;
+        }
+      })();
+
+      return autoSyncInFlight;
     }
 
     createPairButton.onclick = async () => {
@@ -838,6 +891,18 @@
       renderShortcutUrl(loadRegistration());
     });
 
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        autoSyncRegistration();
+      }
+    });
+
+    window.setInterval(() => {
+      if (document.visibilityState === "visible") {
+        autoSyncRegistration();
+      }
+    }, AUTO_SYNC_INTERVAL_MS);
+
     if (savedRegistration) {
       if (savedRegistration.inviteToken && savedRegistration.pairId) {
         pairIdInput.value = savedRegistration.pairId;
@@ -863,6 +928,8 @@
       inviteUrlInput.value = window.location.href;
       setStatus(registerStatus, "Ссылка приглашения распознана. Осталось нажать регистрацию.", "success");
     }
+
+    autoSyncRegistration();
   </script>
 </body>
 </html>
